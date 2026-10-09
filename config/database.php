@@ -36,11 +36,11 @@ class Database {
             ];
 
             try {
-                self::$instance = new PDO($dsn, self::$username, self::$password, $options);
+                self::$instance = new PDO($dsn, $username, $password, $options);
             } catch (PDOException $e) {
-                // บันทึก Error Log ทางฝั่ง Server เพื่อความปลอดภัย (ไม่เปิดเผย Password หรือ DSN ต่อสาธารณะ)
+                // บันทึก Error Log ทางฝั่ง Server
                 error_log("[Database Connection Error] " . $e->getMessage());
-                throw new Exception("ไม่สามารถเชื่อมต่อฐานข้อมูลได้: กรุณาตรวจสอบ MySQL Service บน XAMPP หรือการตั้งค่า Config");
+                throw new Exception("ไม่สามารถเชื่อมต่อฐานข้อมูลได้: " . $e->getMessage());
             }
         }
 
