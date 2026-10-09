@@ -20,7 +20,13 @@ class Database {
      */
     public static function getConnection(): PDO {
         if (self::$instance === null) {
-            $dsn = "mysql:host=" . self::$host . ";dbname=" . self::$db_name . ";charset=" . self::$charset;
+            $host     = getenv('DB_HOST') ?: self::$host;
+            $port     = getenv('DB_PORT') ?: '3306';
+            $dbName   = getenv('DB_NAME') ?: self::$db_name;
+            $username = getenv('DB_USER') ?: self::$username;
+            $password = getenv('DB_PASS') !== false ? getenv('DB_PASS') : self::$password;
+
+            $dsn = "mysql:host={$host};port={$port};dbname={$dbName};charset=" . self::$charset;
             
             $options = [
                 PDO::ATTR_ERRMODE            => PDO::ERRMODE_EXCEPTION,
