@@ -19,23 +19,37 @@ try {
         PDO::MYSQL_ATTR_INIT_COMMAND     => "SET NAMES utf8mb4"
     ]);
 
-    // ตรวจสอบว่ามีตาราง bhs_shift_reports หรือยัง
-    $stmt = $pdo->query("SHOW TABLES LIKE 'bhs_shift_reports'");
-    $tableExists = $stmt->fetch();
+    // ตรวจสอบว่ามีตาราง users หรือยัง
+    $stmtUsers = $pdo->query("SHOW TABLES LIKE 'users'");
+    $usersExist = $stmtUsers->fetch();
 
-    if (!$tableExists) {
+    if (!$usersExist) {
+        echo "[DB Init] Table 'users' not found. Running datamanbhs.sql...\n";
         $sqlFile = __DIR__ . '/datamanbhs.sql';
         if (file_exists($sqlFile)) {
-            echo "[DB Init] Database is empty. Importing datamanbhs.sql...\n";
+            $pdo->exec("SET FOREIGN_KEY_CHECKS=0;");
             $sql = file_get_contents($sqlFile);
             $pdo->exec($sql);
-            echo "[DB Init] Database tables and sample data imported successfully!\n";
-        } else {
-            echo "[DB Init] Warning: datamanbhs.sql not found.\n";
+            $pdo->exec("SET FOREIGN_KEY_CHECKS=1;");
+            echo "[DB Init] Database imported successfully!\n";
         }
     } else {
-        echo "[DB Init] Database tables already exist. Skipping import.\n";
+        echo "[DB Init] Table 'users' already exists.\n";
     }
+
+    // เพื่อความมั่นใจ 100% ตรวจสอบว่ามีผู้ใช้ admin อยู่ในตารางหรือไม่
+    $stmtAdmin = $pdo->query("SELECT COUNT(*) FROM users WHERE username = 'admin'");
+    $adminCount = (int)$stmtAdmin->fetchColumn();
+    if ($adminCount === 0) {
+        echo "[DB Init] Creating default admin user...\n";
+        $hash = password_hash('123456', PASSWORD_BCRYPT);
+        $pdo->prepare("INSERT INTO users (username, password, full_name, role, status) VALUES ('admin', :p, 'ผู้ดูแลระบบ (Admin BHS)', 'admin', 'active')")
+            ->execute([':p' => $hash]);
+        $pdo->prepare("INSERT INTO users (username, password, full_name, role, status) VALUES ('user', :p, 'General User', 'user', 'active')")
+            ->execute([':p' => $hash]);
+        echo "[DB Init] Default users created!\n";
+    }
+
 } catch (Exception $e) {
     echo "[DB Init Warning] " . $e->getMessage() . "\n";
 }

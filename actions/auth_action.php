@@ -46,6 +46,13 @@ if ($action === 'login') {
 
     try {
         $pdo = Database::getConnection();
+
+        // ตรวจสอบว่ามีตาราง users หรือไม่ หากไม่มีให้ Auto-initialize ทันที
+        $checkTable = $pdo->query("SHOW TABLES LIKE 'users'")->fetch();
+        if (!$checkTable) {
+            require_once __DIR__ . '/../init_db.php';
+        }
+
         $stmt = $pdo->prepare("SELECT id, username, password, full_name, role, can_edit, status FROM users WHERE username = :u LIMIT 1");
         $stmt->execute([':u' => $username]);
         $user = $stmt->fetch();
@@ -71,7 +78,7 @@ if ($action === 'login') {
 
     } catch (Exception $e) {
         error_log("[Login Error] " . $e->getMessage());
-        set_flash('danger', 'เกิดข้อผิดพลาดในการเข้าสู่ระบบ กรุณาลองใหม่อีกครั้ง');
+        set_flash('danger', 'เกิดข้อผิดพลาดในการเชื่อมต่อฐานข้อมูล: ' . $e->getMessage());
         redirect('views/login.php');
     }
 }
