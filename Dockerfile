@@ -1,6 +1,6 @@
 FROM php:8.2-apache
 
-# ติดตั้ง PHP Extensions ที่จำเป็น พร้อมปิด MPM ที่ชนกัน
+# ติดตั้ง PHP Extensions ที่จำเป็น และบังคับล้าง MPM อื่นให้เหลือแค่ mpm_prefork
 RUN apt-get update && apt-get install -y \
     libxml2-dev \
     libcurl4-openssl-dev \
@@ -9,7 +9,7 @@ RUN apt-get update && apt-get install -y \
     zip \
     unzip \
     && docker-php-ext-install pdo pdo_mysql dom mbstring curl \
-    && (a2dismod mpm_event mpm_worker || true) \
+    && rm -f /etc/apache2/mods-enabled/mpm_* \
     && a2enmod mpm_prefork rewrite \
     && echo "ServerName localhost" >> /etc/apache2/apache2.conf \
     && sed -i 's/AllowOverride None/AllowOverride All/g' /etc/apache2/apache2.conf \
@@ -29,4 +29,4 @@ RUN chown -R www-data:www-data /var/www/html \
 # กำหนด Port
 EXPOSE 80
 
-CMD ["sh", "-c", "if [ -n \"$PORT\" ] && [ \"$PORT\" != \"80\" ]; then echo \"Listen $PORT\" >> /etc/apache2/ports.conf; fi && (php /var/www/html/init_db.php &) && exec apache2-foreground"]
+CMD ["sh", "-c", "rm -f /etc/apache2/mods-enabled/mpm_event.* /etc/apache2/mods-enabled/mpm_worker.* && a2enmod mpm_prefork && if [ -n \"$PORT\" ] && [ \"$PORT\" != \"80\" ]; then echo \"Listen $PORT\" >> /etc/apache2/ports.conf; fi && (php /var/www/html/init_db.php &) && exec apache2-foreground"]
