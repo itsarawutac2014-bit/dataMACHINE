@@ -1,6 +1,6 @@
 FROM php:8.2-apache
 
-# ติดตั้ง PHP Extensions ที่จำเป็น
+# ติดตั้ง PHP Extensions ที่จำเป็น พร้อมปิด MPM ที่ชนกัน
 RUN apt-get update && apt-get install -y \
     libxml2-dev \
     libcurl4-openssl-dev \
@@ -9,7 +9,8 @@ RUN apt-get update && apt-get install -y \
     zip \
     unzip \
     && docker-php-ext-install pdo pdo_mysql dom mbstring curl \
-    && a2enmod rewrite \
+    && (a2dismod mpm_event mpm_worker || true) \
+    && a2enmod mpm_prefork rewrite \
     && echo "ServerName localhost" >> /etc/apache2/apache2.conf \
     && sed -i 's/AllowOverride None/AllowOverride All/g' /etc/apache2/apache2.conf \
     && sed -i 's/<VirtualHost \*:80>/<VirtualHost _default_:*>/g' /etc/apache2/sites-available/000-default.conf \
