@@ -18,11 +18,12 @@ WORKDIR /var/www/html
 # คัดลอกโค้ดทั้งหมดเข้า Container
 COPY . /var/www/html/
 
-# ตั้งค่าสิทธิ์โฟลเดอร์สำหรับ Apache
+# ตั้งค่าสิทธิ์โฟลเดอร์สำหรับ Apache และ start.sh
 RUN chown -R www-data:www-data /var/www/html \
-    && chmod -R 755 /var/www/html
+    && chmod -R 755 /var/www/html \
+    && chmod +x /var/www/html/start.sh
 
 # กำหนด Port
 EXPOSE 80
 
-CMD ["apache2-foreground"]
+CMD ["/bin/bash", "/var/www/html/start.sh"]
