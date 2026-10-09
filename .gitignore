@@ -1,0 +1,16 @@
+# Environment and configuration
+config/database.local.php
+
+# User uploads and temporary files
+uploads/*
+!uploads/.gitkeep
+*.xlsx
+*.xls
+relive_*.txt
+
+# OS and Editor files
+.DS_Store
+Thumbs.db
+*.log
+.vscode/
+.idea/
