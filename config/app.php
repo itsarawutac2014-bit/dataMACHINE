@@ -20,8 +20,10 @@ define('APP_NAME', 'BHS Performance Shift System');
 define('APP_TITLE', 'ระบบรายงานประสิทธิภาพการเดินงาน BHS ประจำกะ');
 define('APP_VERSION', '1.0.0');
 
-// Base URL อัตโนมัติสำหรับ XAMPP
-$protocol = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') ? "https://" : "http://";
+// Base URL อัตโนมัติสำหรับ XAMPP และ Cloud Reverse Proxy
+$isHttps = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') 
+    || (isset($_SERVER['HTTP_X_FORWARDED_PROTO']) && $_SERVER['HTTP_X_FORWARDED_PROTO'] === 'https');
+$protocol = $isHttps ? "https://" : "http://";
 $host = $_SERVER['HTTP_HOST'] ?? 'localhost';
 $scriptDir = str_replace('\\', '/', dirname($_SERVER['SCRIPT_NAME']));
 $baseUrl = rtrim($protocol . $host . $scriptDir, '/');
