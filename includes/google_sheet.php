@@ -147,34 +147,25 @@ function send_payload_to_google_sheet(array $payload): array {
 function calculate_report_summary_engine(PDO $pdo, array $report): array {
     $reportId = (int)$report['id'];
 
-    // ดึงข้อมูลรายการย่อย
-    $stmtItems = $pdo->prepare("SELECT * FROM bhs_report_items WHERE report_id = :report_id");
-    $stmtItems->execute([':report_id' => $reportId]);
-    $items = $stmtItems->fetchAll();
+    // ดึงรายการแถวข้อมูลการผลิตทั้งหมด
+    $stmtRecs = $pdo->prepare("SELECT * FROM bhs_production_records WHERE report_id = :id ORDER BY seq_no ASC");
+    $stmtRecs->execute([':id' => $reportId]);
+    $rawRecords = $stmtRecs->fetchAll();
 
-    $totFluteMeters = 0;
-    $totFluteWeight = 0;
-    $totalOrdersActual = count($items);
-    $totalProdSec = 0;
+    // คำนวณสรุปผลตาม BhsEngine
+    $summary = BhsEngine::computeReportSummary($rawRecords);
 
-    foreach ($items as $it) {
-        $totFluteMeters += (float)($it['tot_meters'] ?? 0);
-        $totFluteWeight += (float)($it['tot_weight'] ?? 0);
-        $totalProdSec   += (int)($it['prod_sec'] ?? 0);
-    }
-
-    $avgSpeedActual = ($totalProdSec > 0) ? round(($totFluteMeters / ($totalProdSec / 60)), 1) : 0;
+    $totFluteMeters = (float)($summary['total_meters'] ?? 0);
+    $totFluteWeight = (float)($summary['total_weight'] ?? 0);
+    $totalOrdersActual = (int)($summary['total_orders'] ?? count($rawRecords));
+    $avgSpeedActual = (float)($summary['avg_speed'] ?? 0);
 
     // คำนวณเวลาเดินกะ (นาที)
-    $startTime = $report['shift_start_time'] ?? '08:00';
-    $endTime   = $report['shift_end_time'] ?? '20:00';
-    $t1 = strtotime("1970-01-01 $startTime:00");
-    $t2 = strtotime("1970-01-01 $endTime:00");
-    $actualShiftDuration = (int)($report['actual_time_total'] ?? 0);
-    if ($actualShiftDuration <= 0 && $t1 && $t2) {
-        $diff = ($t2 - $t1) / 60;
-        if ($diff < 0) $diff += 24 * 60; // ข้ามวัน
-        $actualShiftDuration = (int)$diff;
+    $startTime = $report['shift_start_time'] ?? '20:00';
+    $endTime   = $report['shift_end_time'] ?? '07:40';
+    $actualShiftDuration = BhsEngine::calculateShiftDurationMinutes($startTime, $endTime);
+    if (!empty($report['actual_time_total'])) {
+        $actualShiftDuration = (int)$report['actual_time_total'];
     }
 
     // เวลาสูญเสีย

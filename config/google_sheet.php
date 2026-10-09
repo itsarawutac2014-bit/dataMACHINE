@@ -12,7 +12,7 @@
  */
 
 // ใส่ Web App URL ที่ได้จาก Google Apps Script (หากเว้นว่างไว้ ระบบจะยังไม่ส่งไป Google Sheets)
-define('GOOGLE_SHEET_WEBHOOK_URL', '');
+define('GOOGLE_SHEET_WEBHOOK_URL', 'https://script.google.com/macros/s/AKfycbyxFU9DOGJeeS70p0B21mxZ3DlYhQXw0d_jqDZ2McsasvLqKAx38ifYOhVQDD2xHqr1/exec');
 
 // ตั้งค่าว่าต้องการให้ระบบส่งข้อมูลไป Google Sheets อัตโนมัติเมื่อกดบันทึก/อัปโหลดหรือไม่
 define('GOOGLE_SHEET_AUTO_SYNC', true);
