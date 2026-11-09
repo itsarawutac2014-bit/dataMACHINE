@@ -1,0 +1,13 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <title>กำลังเปลี่ยนเส้นทาง... | BHS Performance</title>
+    <script>
+        sessionStorage.setItem('gh_pages_redirect', window.location.pathname + window.location.search);
+        const repoBase = window.location.pathname.includes('/dataMACHINE/') ? '/dataMACHINE/' : '/';
+        window.location.replace(repoBase);
+    </script>
+</head>
+<body></body>
+</html>

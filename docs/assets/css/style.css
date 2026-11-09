@@ -1,0 +1,230 @@
+/* 
+ * BHS Performance System - Clean Orange & White Theme
+ */
+
+:root {
+    --theme-orange: #ff6b00;
+    --theme-orange-dark: #e05500;
+    --theme-orange-light: #fff3eb;
+    --theme-orange-border: #ffd5be;
+    --theme-gray-bg: #f8f9fa;
+    --theme-card-border: #e9ecef;
+}
+
+body {
+    font-family: 'Prompt', 'Sarabun', sans-serif;
+    color: #333333;
+    background-color: #f7f8fa;
+    font-size: 0.95rem;
+}
+
+/* Theme Classes */
+.bg-theme-orange {
+    background-color: var(--theme-orange) !important;
+}
+
+.text-orange {
+    color: var(--theme-orange) !important;
+}
+
+.border-orange {
+    border-color: var(--theme-orange) !important;
+}
+
+.btn-orange {
+    background-color: var(--theme-orange);
+    color: #ffffff;
+    border: none;
+    font-weight: 500;
+    transition: all 0.2s ease-in-out;
+}
+
+.btn-orange:hover {
+    background-color: var(--theme-orange-dark);
+    color: #ffffff;
+    box-shadow: 0 4px 12px rgba(255, 107, 0, 0.35);
+}
+
+.btn-outline-orange {
+    color: var(--theme-orange);
+    border: 1.5px solid var(--theme-orange);
+    background-color: #ffffff;
+    font-weight: 500;
+}
+
+.btn-outline-orange:hover {
+    background-color: var(--theme-orange);
+    color: #ffffff;
+}
+
+/* Font Sizing Helpers */
+.fs-7 { font-size: 0.85rem !important; }
+.fs-8 { font-size: 0.78rem !important; }
+.fs-9 { font-size: 0.70rem !important; }
+
+/* Custom Cards */
+.card-theme {
+    background: #ffffff;
+    border: 1px solid var(--theme-card-border);
+    border-radius: 10px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+}
+
+.card-header-theme {
+    background-color: #ffffff;
+    border-bottom: 2px solid var(--theme-orange);
+    padding: 12px 18px;
+    font-weight: 600;
+}
+
+/* Report Table Custom Color Palettes (Accurately Matching BHS Shift Image) */
+.table-bhs {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+    margin-bottom: 0;
+}
+
+.table-bhs th, .table-bhs td {
+    padding: 4px 6px;
+    border: 1px solid #777777;
+    vertical-align: middle;
+}
+
+.table-bhs th {
+    text-align: center;
+    font-weight: 600;
+}
+
+/* Section 1: KPI Department Table (Red/Orange/Pink Theme from Image) */
+.th-kpi-main { background-color: #f59e0b !important; color: #ffffff !important; font-size: 14px; text-shadow: 0 1px 2px rgba(0,0,0,0.35); }
+.th-kpi-green { background-color: #a9d08e !important; color: #000; }
+.td-kpi-pink { background-color: #fce4d6; }
+.td-kpi-yellow { background-color: #fffbf0; }
+.td-kpi-green-light { background-color: #e2efda; }
+.td-kpi-summary-white,
+.td-kpi-red-head { background-color: #ffffff !important; color: #1e293b !important; font-weight: bold; }
+
+/* Section 2 & 3: GSM Tables (Green & Yellow from Image) */
+.th-gsm-green { background-color: #92d050 !important; color: #000; font-weight: bold; }
+.th-gsm-yellow { background-color: #f59e0b !important; color: #ffffff !important; font-weight: bold; text-shadow: 0 1px 2px rgba(0,0,0,0.35); }
+.td-gsm-yellow { background-color: #fffbf0; }
+.td-gsm-green { background-color: #c6efce; }
+.tr-gsm-total { background-color: #f59e0b !important; color: #ffffff !important; font-weight: bold; text-shadow: 0 1px 2px rgba(0,0,0,0.35); }
+.tr-gsm-total td { color: #ffffff !important; }
+
+/* Section 4: รายการที่ต้องการ (Flute) */
+.th-flute-head { background-color: #c6e0b4 !important; color: #000; }
+.td-flute-yellow { background-color: #fffbf0; }
+.td-flute-pink { background-color: #fce4d6; }
+.td-flute-green { background-color: #a9d08e; font-weight: bold; }
+
+/* Section 5: Meter Range & Trim */
+.th-range-yellow { background-color: #f59e0b !important; color: #ffffff !important; font-weight: bold; text-shadow: 0 1px 2px rgba(0,0,0,0.35); }
+.td-range-white { background-color: #ffffff; }
+
+/* HD Capture Container Styles */
+#hdReportCaptureArea {
+    background-color: #ffffff;
+    padding: 16px;
+    border-radius: 8px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+}
+
+/* Full Width Fluid helper */
+.full-screen-container {
+    width: 100%;
+    max-width: 100%;
+}
+
+/* Upload Dropzone */
+.upload-dropzone {
+    border: 2.5px dashed var(--theme-orange);
+    border-radius: 12px;
+    background-color: var(--theme-orange-light);
+    padding: 30px;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.25s ease;
+}
+
+.upload-dropzone:hover, .upload-dropzone.dragover {
+    background-color: #ffe6d6;
+    border-color: var(--theme-orange-dark);
+}
+
+/* Inline Table Editable Inputs */
+.table-input-cell {
+    background: transparent;
+    border: none;
+    border-bottom: 1px dashed rgba(0, 0, 0, 0.25);
+    text-align: center;
+    font-weight: 600;
+    font-size: 13px;
+    padding: 1px 3px;
+    color: inherit;
+    outline: none;
+    transition: all 0.15s ease-in-out;
+}
+.table-input-cell:focus {
+    background: #ffffff !important;
+    border-bottom: 2px solid var(--theme-orange) !important;
+    box-shadow: 0 0 5px rgba(255, 107, 0, 0.35);
+    border-radius: 3px;
+    color: #000000 !important;
+}
+.table-input-cell::-webkit-inner-spin-button,
+.table-input-cell::-webkit-outer-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+.table-input-cell[type=number] {
+    -moz-appearance: textfield;
+}
+
+/* HD Screenshot Capture Mode */
+.is-capturing {
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+    -webkit-font-smoothing: antialiased !important;
+    -moz-osx-font-smoothing: grayscale !important;
+    text-rendering: optimizeLegibility !important;
+    overflow: visible !important;
+}
+.is-capturing .table-input-cell {
+    border: none !important;
+    border-bottom: none !important;
+    background: transparent !important;
+    box-shadow: none !important;
+    outline: none !important;
+    -webkit-appearance: none !important;
+    appearance: none !important;
+    padding: 0 2px !important;
+}
+.is-capturing input,
+.is-capturing textarea,
+.is-capturing select {
+    border: none !important;
+    outline: none !important;
+    box-shadow: none !important;
+    background: transparent !important;
+    -webkit-appearance: none !important;
+    appearance: none !important;
+}
+.is-capturing .no-capture-inline {
+    display: none !important;
+}
+/* ซ่อนปุ่ม scroll/action ต่างๆ ในโหมดบันทึกภาพ */
+.is-capturing .btn,
+.is-capturing button {
+    display: none !important;
+}
+.is-capturing .card {
+    page-break-inside: avoid;
+}
+
+/* Canvas Crisp Text & High Contrast */
+#hdReportCaptureArea canvas {
+    image-rendering: -webkit-optimize-contrast;
+    image-rendering: crisp-edges;
+}

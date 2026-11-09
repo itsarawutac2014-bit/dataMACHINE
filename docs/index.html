@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ระบบรายงานประสิทธิภาพการเดินงาน BHS ประจำกะ</title>
+
+    <!-- Google Fonts: Sarabun & Prompt -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700&family=Sarabun:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+    <!-- Bootstrap 5 CSS CDN -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Font Awesome Icons CDN -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+
+    <!-- Custom Theme CSS -->
+    <link rel="stylesheet" href="assets/css/style.css">
+</head>
+<body id="appRoot" class="bg-light d-flex flex-column min-vh-100">
+    <div class="d-flex align-items-center justify-content-center min-vh-100">
+        <div class="text-center">
+            <div class="spinner-border text-warning mb-3" role="status"></div>
+            <div class="fw-bold text-secondary">กำลังโหลดระบบรายงานประสิทธิภาพ BHS...</div>
+        </div>
+    </div>
+
+    <!-- Bootstrap 5 Bundle JS -->
+    <script src="assets/js/bootstrap.bundle.min.js"></script>
+    <script>if (typeof bootstrap === 'undefined') document.write('<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"><\/script>');</script>
+
+    <!-- Chart.js -->
+    <script src="assets/js/chart.umd.min.js"></script>
+    <script>if (typeof Chart === 'undefined') document.write('<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"><\/script>');</script>
+
+    <!-- html2canvas -->
+    <script src="assets/js/html2canvas.min.js"></script>
+    <script>if (typeof html2canvas === 'undefined') document.write('<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"><\/script>');</script>
+
+    <!-- SheetJS (xlsx) for client-side .xlsx / .xls parsing -->
+    <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+
+    <!-- Core Chart & Calculation Helpers -->
+    <script src="assets/js/app.js"></script>
+    <script src="assets/js/bhs-engine.js"></script>
+    <script src="assets/js/bhs-spa.js"></script>
+    <script src="assets/js/bhs-spa-views.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            // Map old URL paths (e.g. /views/dashboard.php) if redirected via 404.html
+            const redir = sessionStorage.getItem('gh_pages_redirect');
+            if (redir) {
+                sessionStorage.removeItem('gh_pages_redirect');
+                if (redir.includes('report_view.php')) {
+                    const q = redir.split('?')[1] || '';
+                    window.location.hash = '#report_view' + (q ? '?' + q : '');
+                } else if (redir.includes('upload.php')) {
+                    window.location.hash = '#upload';
+                } else if (redir.includes('admin_targets.php')) {
+                    const q = redir.split('?')[1] || '';
+                    window.location.hash = '#admin_targets' + (q ? '?' + q : '');
+                } else if (redir.includes('users.php')) {
+                    window.location.hash = '#users';
+                } else if (redir.includes('login.php')) {
+                    window.location.hash = '#login';
+                }
+            }
+            window.BhsApp.start();
+        });
+    </script>
+</body>
+</html>
