@@ -913,12 +913,22 @@ Object.assign(window.BhsApp, {
                     <div class="modal-body p-4">
                         <div class="row g-3 mb-3">
                             <div class="col-md-6">
-                                <label class="form-label fw-semibold fs-7 text-secondary">เวลาเริ่มเดิน</label>
-                                <input type="text" id="modShiftStart" class="form-control" value="${this.esc(shiftStartTime)}">
+                                <label class="form-label fw-semibold fs-7 text-secondary">เวลาเริ่มเดิน (24 ชม.)</label>
+                                <input type="text" id="modShiftStart" class="form-control fw-bold text-center" value="${this.esc(shiftStartTime)}" placeholder="เช่น 08:00 หรือ 20:00">
                             </div>
                             <div class="col-md-6">
-                                <label class="form-label fw-semibold fs-7 text-secondary">เวลาจบ/ตัดกะ</label>
-                                <input type="text" id="modShiftEnd" class="form-control" value="${this.esc(shiftEndTime)}">
+                                <label class="form-label fw-semibold fs-7 text-secondary">เวลาจบ/ตัดกะ (24 ชม.)</label>
+                                <input type="text" id="modShiftEnd" class="form-control fw-bold text-center" value="${this.esc(shiftEndTime)}" placeholder="เช่น 16:00 หรือ 08:00">
+                            </div>
+                            <div class="col-12">
+                                <div class="d-flex flex-wrap align-items-center gap-2">
+                                    <span class="fs-8 text-secondary fw-semibold"><i class="fa-solid fa-bolt text-orange me-1"></i> เลือกช่วงเวลาด่วน (24 ชม.):</span>
+                                    <button type="button" class="btn btn-outline-secondary btn-sm py-0 px-2 fs-8 btn-mod-time-preset" data-start="08:00" data-end="16:00">08:00 - 16:00</button>
+                                    <button type="button" class="btn btn-outline-secondary btn-sm py-0 px-2 fs-8 btn-mod-time-preset" data-start="08:00" data-end="20:00">08:00 - 20:00</button>
+                                    <button type="button" class="btn btn-outline-secondary btn-sm py-0 px-2 fs-8 btn-mod-time-preset" data-start="20:00" data-end="08:00">20:00 - 08:00</button>
+                                    <button type="button" class="btn btn-outline-secondary btn-sm py-0 px-2 fs-8 btn-mod-time-preset" data-start="20:00" data-end="07:40">20:00 - 07:40</button>
+                                    <button type="button" class="btn btn-outline-secondary btn-sm py-0 px-2 fs-8 btn-mod-time-preset" data-start="16:00" data-end="24:00">16:00 - 24:00</button>
+                                </div>
                             </div>
                         </div>
                         <p class="text-muted fs-8 mb-0">คุณสามารถปรับเวลาเริ่มเดินและเวลาจบได้ที่นี่ หรือพิมพ์แก้ไขตัวเลขเวลาสูญเสียโดยตรงในตารางหน้าหลักได้เลย</p>
@@ -978,6 +988,15 @@ Object.assign(window.BhsApp, {
         });
 
         // Bind Modal Edit Shift Time
+        document.querySelectorAll('.btn-mod-time-preset').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const s = btn.getAttribute('data-start');
+                const e = btn.getAttribute('data-end');
+                if (s) document.getElementById('modShiftStart').value = s;
+                if (e) document.getElementById('modShiftEnd').value = e;
+            });
+        });
+
         document.getElementById('modalEditLossForm')?.addEventListener('submit', async e => {
             e.preventDefault();
             document.getElementById('hiddenShiftStartTime').value = document.getElementById('modShiftStart').value.trim();

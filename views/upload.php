@@ -103,31 +103,33 @@ require_once __DIR__ . '/../includes/header.php';
 
                         </div>
 
-                        <!-- แถวที่ 2: เวลาเริ่มเดิน, เวลาจบ และสรุปเวลาเดินทั้งหมด -->
+                        <!-- แถวที่ 2: เวลาเริ่มเดิน, เวลาจบ และสรุปเวลาเดินทั้งหมด (ระบบ 24 ชั่วโมง) -->
                         <div class="row g-3 align-items-center mt-1 pt-2 border-top">
                             <!-- 4. เวลาเริ่มเดิน -->
                             <div class="col-md-4">
                                 <label class="form-label fw-bold fs-7 text-dark mb-1">
-                                    <i class="fa-regular fa-clock text-orange me-1"></i> 4. เวลาเริ่มเดิน *
+                                    <i class="fa-regular fa-clock text-orange me-1"></i> 4. เวลาเริ่มเดิน (24 ชม.) *
                                 </label>
                                 <div class="input-group">
                                     <span class="input-group-text bg-white text-orange border-end-0">
                                         <i class="fa-solid fa-play fa-xs"></i>
                                     </span>
-                                    <input type="time" name="shift_start_time" id="shift_start_time" class="form-control border-start-0 ps-1" value="20:00" required>
+                                    <input type="text" name="shift_start_time" id="shift_start_time" list="time24List" class="form-control border-start-0 ps-1 fw-bold text-center" value="20:00" placeholder="เช่น 08:00 หรือ 20:00" maxlength="5" required>
+                                    <span class="input-group-text bg-light text-secondary fs-8">น.</span>
                                 </div>
                             </div>
 
                             <!-- 5. เวลาจบ -->
                             <div class="col-md-4">
                                 <label class="form-label fw-bold fs-7 text-dark mb-1">
-                                    <i class="fa-regular fa-clock text-orange me-1"></i> 5. เวลาจบ *
+                                    <i class="fa-regular fa-clock text-orange me-1"></i> 5. เวลาจบ (24 ชม.) *
                                 </label>
                                 <div class="input-group">
                                     <span class="input-group-text bg-white text-orange border-end-0">
                                         <i class="fa-solid fa-stop fa-xs"></i>
                                     </span>
-                                    <input type="time" name="shift_end_time" id="shift_end_time" class="form-control border-start-0 ps-1" value="07:40" required>
+                                    <input type="text" name="shift_end_time" id="shift_end_time" list="time24List" class="form-control border-start-0 ps-1 fw-bold text-center" value="08:00" placeholder="เช่น 16:00 หรือ 20:00" maxlength="5" required>
+                                    <span class="input-group-text bg-light text-secondary fs-8">น.</span>
                                 </div>
                             </div>
 
@@ -138,8 +140,24 @@ require_once __DIR__ . '/../includes/header.php';
                                 </label>
                                 <div class="alert alert-warning py-1 px-3 mb-0 border rounded-3 d-flex align-items-center justify-content-between">
                                     <span class="fs-8 fw-semibold text-dark">คำนวณอัตโนมัติ:</span>
-                                    <span class="fs-6 fw-bold text-danger" id="displayShiftDuration">700 นาที</span>
+                                    <span class="fs-6 fw-bold text-danger" id="displayShiftDuration">720 นาที</span>
                                 </div>
+                            </div>
+
+                            <div class="col-12 mt-2">
+                                <div class="d-flex flex-wrap align-items-center gap-2">
+                                    <span class="fs-8 text-secondary fw-semibold"><i class="fa-solid fa-bolt text-orange me-1"></i> เลือกช่วงเวลาด่วน (24 ชม.):</span>
+                                    <button type="button" class="btn btn-outline-secondary btn-sm py-0 px-2 fs-8 btn-time-preset" data-start="08:00" data-end="16:00" data-shift="A">08:00 - 16:00 (8 ชม.)</button>
+                                    <button type="button" class="btn btn-outline-secondary btn-sm py-0 px-2 fs-8 btn-time-preset" data-start="08:00" data-end="20:00" data-shift="A">08:00 - 20:00 (12 ชม.)</button>
+                                    <button type="button" class="btn btn-outline-secondary btn-sm py-0 px-2 fs-8 btn-time-preset" data-start="20:00" data-end="08:00" data-shift="B">20:00 - 08:00 (12 ชม.)</button>
+                                    <button type="button" class="btn btn-outline-secondary btn-sm py-0 px-2 fs-8 btn-time-preset" data-start="20:00" data-end="07:40" data-shift="B">20:00 - 07:40 (700 น.)</button>
+                                    <button type="button" class="btn btn-outline-secondary btn-sm py-0 px-2 fs-8 btn-time-preset" data-start="16:00" data-end="24:00" data-shift="B">16:00 - 24:00 (8 ชม.)</button>
+                                </div>
+                                <datalist id="time24List">
+                                    <option value="00:00"><option value="06:00"><option value="07:00"><option value="07:30"><option value="07:40">
+                                    <option value="08:00"><option value="12:00"><option value="16:00"><option value="16:30"><option value="17:00">
+                                    <option value="19:30"><option value="19:40"><option value="20:00"><option value="23:30"><option value="24:00">
+                                </datalist>
                             </div>
                         </div>
 
@@ -437,7 +455,7 @@ document.addEventListener('DOMContentLoaded', function() {
         document.getElementById('sampleEndTime').value   = endTime;
     }
 
-    // เมื่อเปลี่ยนกะ ให้เปลี่ยนเวลาเริ่มต้นอัตโนมัติ
+    // เมื่อเปลี่ยนกะ ให้เปลี่ยนเวลาเริ่มต้นอัตโนมัติ (24 ชม.)
     document.querySelectorAll('input[name="shift"]').forEach(el => {
         el.addEventListener('change', function() {
             if (this.value === 'A') {
@@ -445,7 +463,22 @@ document.addEventListener('DOMContentLoaded', function() {
                 document.getElementById('shift_end_time').value   = '20:00';
             } else if (this.value === 'B') {
                 document.getElementById('shift_start_time').value = '20:00';
-                document.getElementById('shift_end_time').value   = '07:40';
+                document.getElementById('shift_end_time').value   = '08:00';
+            }
+            calculateDuration();
+        });
+    });
+
+    document.querySelectorAll('.btn-time-preset').forEach(btn => {
+        btn.addEventListener('click', function() {
+            const s = this.getAttribute('data-start');
+            const e = this.getAttribute('data-end');
+            const sh = this.getAttribute('data-shift');
+            if (s) document.getElementById('shift_start_time').value = s;
+            if (e) document.getElementById('shift_end_time').value = e;
+            if (sh) {
+                const radio = document.querySelector(`input[name="shift"][value="${sh}"]`);
+                if (radio) radio.checked = true;
             }
             calculateDuration();
         });
