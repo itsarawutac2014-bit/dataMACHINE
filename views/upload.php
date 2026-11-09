@@ -173,10 +173,10 @@ require_once __DIR__ . '/../includes/header.php';
                             <span class="badge bg-secondary ms-2 fs-9">Optional</span>
                         </div>
 
-                        <!-- แถว A: Order Start / Finit + ขาดจำนวน -->
+                        <!-- แถว A: Order Start / Finit + เมตรเดินงานจริง + ขาดจำนวน -->
                         <div class="row g-3 mb-3">
                             <!-- Order Start (ออเดอร์แรกที่เริ่มเดิน) -->
-                            <div class="col-md-4">
+                            <div class="col-md-3 col-6">
                                 <label class="form-label fw-bold fs-8 text-dark mb-1">
                                     <i class="fa-solid fa-flag-checkered text-success me-1"></i>
                                     Order เริ่มเดิน (Start)
@@ -187,13 +187,13 @@ require_once __DIR__ . '/../includes/header.php';
                                     </span>
                                     <input type="text" name="order_start" id="order_start"
                                            class="form-control form-control-sm"
-                                           placeholder="เช่น PDC-001234"
+                                           placeholder="เช่น 10"
                                            maxlength="30">
                                 </div>
                             </div>
 
                             <!-- Order Finit (ออเดอร์สุดท้ายที่เดินจบ) -->
-                            <div class="col-md-4">
+                            <div class="col-md-3 col-6">
                                 <label class="form-label fw-bold fs-8 text-dark mb-1">
                                     <i class="fa-solid fa-flag text-danger me-1"></i>
                                     Order เดินจบ (Finit)
@@ -204,16 +204,30 @@ require_once __DIR__ . '/../includes/header.php';
                                     </span>
                                     <input type="text" name="order_finit" id="order_finit"
                                            class="form-control form-control-sm"
-                                           placeholder="เช่น PDC-001456"
+                                           placeholder="เช่น 1120"
                                            maxlength="30">
                                 </div>
                             </div>
 
+                            <!-- เมตรเดินงานจริง -->
+                            <div class="col-md-3 col-6">
+                                <label class="form-label fw-bold fs-8 text-dark mb-1">
+                                    <i class="fa-solid fa-ruler-horizontal text-primary me-1"></i>
+                                    เมตรเดินงานจริง
+                                </label>
+                                <div class="input-group input-group-sm">
+                                    <input type="number" step="any" min="0" name="actual_meters" id="actual_meters"
+                                           class="form-control form-control-sm text-center fw-bold text-primary"
+                                           placeholder="เว้นว่าง=ดึงจากไฟล์">
+                                    <span class="input-group-text bg-light text-secondary">เมตร</span>
+                                </div>
+                            </div>
+
                             <!-- งานขาดจำนวน -->
-                            <div class="col-md-4">
+                            <div class="col-md-3 col-6">
                                 <label class="form-label fw-bold fs-8 text-dark mb-1">
                                     <i class="fa-solid fa-triangle-exclamation text-warning me-1"></i>
-                                    งานขาดจำนวน (Shortage Orders)
+                                    งานขาดจำนวน (Shortage)
                                 </label>
                                 <div class="input-group input-group-sm">
                                     <input type="number" name="shortage_orders" id="shortage_orders"

@@ -81,8 +81,9 @@ Object.assign(window.BhsApp, {
         } catch (e) {}
 
         const totalOrdersActual = summary.total_orders;
-        const totalMetersActual = summary.total_meters;
-        const avgMetersActual   = summary.avg_meters_per_order;
+        const dataMetersActual  = summary.total_meters;
+        const totalMetersActual = (Number(report.actual_meters) > 0) ? Number(report.actual_meters) : dataMetersActual;
+        const avgMetersActual   = totalOrdersActual > 0 ? Math.round((totalMetersActual / totalOrdersActual) * 10) / 10 : summary.avg_meters_per_order;
         let avgSpeedGross       = summary.avg_speed_gross;
         let avgSpeedNet         = summary.avg_speed_net;
 
@@ -371,9 +372,11 @@ Object.assign(window.BhsApp, {
                                         <td class="td-kpi-pink fw-bold ${totalOrdersActual >= targetOrders ? 'text-success' : 'text-danger'}" id="lblTotalOrdersScore">${totalOrdersActual >= targetOrders ? 3 : 1}</td>
                                     </tr>
                                     <tr>
-                                        <td class="td-kpi-pink text-start">ผลิตได้</td>
+                                        <td class="td-kpi-pink text-start">ผลิตได้ (เมตรเดินงานจริง)</td>
                                         <td class="td-kpi-pink text-primary fw-bold">${this.numFmt(targetMeters)}</td>
-                                        <td class="td-kpi-pink fw-bold text-danger fs-6" colspan="3" id="lblTotalMetersActual">${this.numFmt(totalMetersActual)}</td>
+                                        <td class="td-kpi-pink fw-bold text-danger fs-6" colspan="3" id="lblTotalMetersActual">
+                                            <input type="number" step="any" min="0" name="actual_meters" id="inpActualMeters" class="table-input-cell fw-bold text-danger fs-6" value="${totalMetersActual}" style="width: 110px;" title="เมตรเดินงานจริง (ข้อมูลจากไฟล์: ${this.numFmt(dataMetersActual)} เมตร)">
+                                        </td>
                                         <td class="td-kpi-pink">เมตร</td>
                                         <td class="td-kpi-pink fw-bold" id="lblTotalMetersPct">${targetMeters > 0 ? Math.round((totalMetersActual / targetMeters) * 100) : 0}%</td>
                                         <td class="td-kpi-pink fw-bold ${totalMetersActual >= targetMeters ? 'text-success' : 'text-danger'}" id="lblTotalMetersScore">${totalMetersActual >= targetMeters ? 3 : 1}</td>
@@ -400,7 +403,7 @@ Object.assign(window.BhsApp, {
                                         <td class="td-kpi-pink fw-bold text-danger fs-6" colspan="3" id="lblAvgMetersActual">${this.numFmt(avgMetersActual)}</td>
                                         <td class="td-kpi-pink">เมตร</td>
                                         <td class="td-kpi-pink fw-bold" id="lblAvgMetersPct">${targetAvgMeters > 0 ? Math.round((avgMetersActual / targetAvgMeters) * 100) : 0}%</td>
-                                        <td class="td-kpi-pink fw-bold text-danger" id="lblAvgMetersScore">1</td>
+                                        <td class="td-kpi-pink fw-bold ${avgMetersActual >= targetAvgMeters ? 'text-success' : 'text-danger'}" id="lblAvgMetersScore">${avgMetersActual >= targetAvgMeters ? 3 : 1}</td>
                                     </tr>
                                     <tr>
                                         <td class="td-kpi-pink text-start">Speed เฉลี่ยหักสูญเสีย</td>
@@ -912,13 +915,18 @@ Object.assign(window.BhsApp, {
                     </div>
                     <div class="modal-body p-4">
                         <div class="row g-3 mb-3">
-                            <div class="col-md-6">
+                            <div class="col-md-4">
                                 <label class="form-label fw-semibold fs-7 text-secondary">เวลาเริ่มเดิน (24 ชม.)</label>
                                 <input type="text" id="modShiftStart" class="form-control fw-bold text-center" value="${this.esc(shiftStartTime)}" placeholder="เช่น 08:00 หรือ 20:00">
                             </div>
-                            <div class="col-md-6">
+                            <div class="col-md-4">
                                 <label class="form-label fw-semibold fs-7 text-secondary">เวลาจบ/ตัดกะ (24 ชม.)</label>
                                 <input type="text" id="modShiftEnd" class="form-control fw-bold text-center" value="${this.esc(shiftEndTime)}" placeholder="เช่น 16:00 หรือ 08:00">
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label fw-semibold fs-7 text-primary">เมตรเดินงานจริง (เมตร)</label>
+                                <input type="number" step="any" min="0" id="modActualMeters" class="form-control fw-bold text-center text-primary" value="${totalMetersActual}" placeholder="เมตรเดินงานจริง">
+                                <div class="form-text fs-9">ข้อมูลจากไฟล์: <strong>${this.numFmt(dataMetersActual)}</strong> เมตร</div>
                             </div>
                             <div class="col-12">
                                 <div class="d-flex flex-wrap align-items-center gap-2">
@@ -1001,6 +1009,11 @@ Object.assign(window.BhsApp, {
             e.preventDefault();
             document.getElementById('hiddenShiftStartTime').value = document.getElementById('modShiftStart').value.trim();
             document.getElementById('hiddenShiftEndTime').value = document.getElementById('modShiftEnd').value.trim();
+            const modMeters = document.getElementById('modActualMeters');
+            const inpActualMeters = document.getElementById('inpActualMeters');
+            if (modMeters && inpActualMeters) {
+                inpActualMeters.value = modMeters.value;
+            }
             const modalEl = document.getElementById('modalEditLoss');
             bootstrap.Modal.getInstance(modalEl)?.hide();
             await this.saveReportKpiInline(report, document.getElementById('btnSaveInlineKpiTop'));
@@ -1038,6 +1051,7 @@ Object.assign(window.BhsApp, {
         report.order_start      = parseInt(document.getElementById('inpOrderStart')?.value || 0, 10);
         report.order_finit      = parseInt(document.getElementById('inpOrderFinit')?.value || 0, 10);
         report.order_plan_total = parseInt(document.getElementById('inpOrderPlanTotal')?.value || 0, 10);
+        report.actual_meters    = parseFloat(document.getElementById('inpActualMeters')?.value || 0);
         report.inserted_meters  = parseFloat(document.getElementById('inpInsertedMeters')?.value || 0);
         report.pending_meters   = parseFloat(document.getElementById('inpPendingMeters')?.value || 0);
         report.shortage_orders  = parseInt(document.getElementById('inpShortageOrders')?.value || 0, 10);

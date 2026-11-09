@@ -290,15 +290,40 @@ window.recalculateTableKpi = function () {
     const form = document.getElementById('formInlineKpi');
     if (!form) return;
 
-    // 1. Production Actuals & Targets from hidden fields
+    // 1. Production Actuals & Targets from hidden fields & inline inputs
     const totalOrdersActual    = Number(document.getElementById('valTotalOrdersActual')?.value || 0);
-    const totalMetersActual    = Number(document.getElementById('valTotalMetersActual')?.value || 0);
+    const inpActualMeters      = document.getElementById('inpActualMeters');
+    const totalMetersActual    = inpActualMeters ? (Number(inpActualMeters.value) || 0) : Number(document.getElementById('valTotalMetersActual')?.value || 0);
     const targetOrders         = Number(document.getElementById('valTargetOrders')?.value || 120);
     const targetMeters         = Number(document.getElementById('valTargetMeters')?.value || 68056);
     const targetSpeed          = Number(document.getElementById('valTargetSpeed')?.value || 100);
     const targetAvgMeters      = Number(document.getElementById('valTargetAvgMeters')?.value || 500);
     const targetShiftTotalTime = Number(document.getElementById('valTargetShiftTotalTime')?.value || 720);
     const targetTimeRun        = Number(document.getElementById('valTargetTimeRun')?.value || 675);
+
+    // 1b. อัปเดต % Actual และ คะแนน ของช่อง "ผลิตได้ (เมตรเดินงานจริง)" และ "เมตรเฉลี่ย/order"
+    const totalMetersPct   = targetMeters > 0 ? Math.round((totalMetersActual / targetMeters) * 100) : 0;
+    const totalMetersScore = totalMetersActual >= targetMeters ? 3 : 1;
+    const lblTotalMetersPct   = document.getElementById('lblTotalMetersPct');
+    const lblTotalMetersScore = document.getElementById('lblTotalMetersScore');
+    if (lblTotalMetersPct) lblTotalMetersPct.textContent = totalMetersPct + '%';
+    if (lblTotalMetersScore) {
+        lblTotalMetersScore.textContent = totalMetersScore;
+        lblTotalMetersScore.className = 'td-kpi-pink fw-bold ' + (totalMetersScore >= 3 ? 'text-success' : 'text-danger');
+    }
+
+    const avgMetersActual = totalOrdersActual > 0 ? Math.round((totalMetersActual / totalOrdersActual) * 10) / 10 : 0;
+    const avgMetersPct    = targetAvgMeters > 0 ? Math.round((avgMetersActual / targetAvgMeters) * 100) : 0;
+    const avgMetersScore  = avgMetersActual >= targetAvgMeters ? 3 : 1;
+    const lblAvgMetersActual = document.getElementById('lblAvgMetersActual');
+    const lblAvgMetersPct    = document.getElementById('lblAvgMetersPct');
+    const lblAvgMetersScore  = document.getElementById('lblAvgMetersScore');
+    if (lblAvgMetersActual) lblAvgMetersActual.textContent = avgMetersActual.toLocaleString('en-US', { maximumFractionDigits: 1 });
+    if (lblAvgMetersPct)    lblAvgMetersPct.textContent = avgMetersPct + '%';
+    if (lblAvgMetersScore) {
+        lblAvgMetersScore.textContent = avgMetersScore;
+        lblAvgMetersScore.className = 'td-kpi-pink fw-bold ' + (avgMetersScore >= 3 ? 'text-success' : 'text-danger');
+    }
 
     // 2. เวลาเดินทั้งหมด (คำนวณจากเวลาเริ่มเดิน และเวลาจบ เสมอ)
     const startTimeStr = document.getElementById('hiddenShiftStartTime')?.value || '20:00';

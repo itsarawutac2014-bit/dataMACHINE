@@ -403,14 +403,16 @@ const BhsApp = {
         const enrichedReports = reports.map(r => {
             const recs = allRecords.filter(p => Number(p.report_id) === Number(r.id));
             const sumM = recs.reduce((acc, p) => acc + (Number(p.total_length_m) || 0), 0);
+            const actualM = Number(r.actual_meters) > 0 ? Number(r.actual_meters) : sumM;
             const sumW = recs.reduce((acc, p) => acc + (Number(p.total_weight_kg) || 0), 0);
             totalOrders += recs.length;
-            totalMeters += sumM;
+            totalMeters += actualM;
             totalWeight += sumW;
             return {
                 ...r,
                 record_count: recs.length,
-                sum_meters: sumM,
+                sum_meters: actualM,
+                data_meters: sumM,
                 sum_weight: sumW,
                 author_name: usersMap[r.created_by] || 'ผู้ดูแลระบบ (Admin BHS)'
             };
@@ -551,7 +553,10 @@ const BhsApp = {
                                         <span class="badge bg-light text-dark border">${this.esc(rep.shift_end_time)}</span>
                                     </td>
                                     <td class="text-center fw-bold">${this.numFmt(rep.record_count)}</td>
-                                    <td class="text-end fw-bold text-primary">${this.numFmt(rep.sum_meters)}</td>
+                                    <td class="text-end fw-bold text-primary">
+                                        ${this.numFmt(rep.sum_meters)}
+                                        ${Math.round(rep.sum_meters) !== Math.round(rep.data_meters) ? `<small class="d-block text-muted fs-9 fw-normal">ข้อมูลไฟล์: ${this.numFmt(rep.data_meters)}</small>` : ''}
+                                    </td>
                                     <td class="text-end fw-bold text-success">${this.numFmt(rep.sum_weight)}</td>
                                     <td class="fs-8 text-muted">
                                         <i class="fa-regular fa-user me-1"></i> ${this.esc(rep.author_name)}
@@ -725,7 +730,7 @@ const BhsApp = {
                                 </div>
 
                                 <div class="row g-3 mb-3">
-                                    <div class="col-md-4">
+                                    <div class="col-md-3 col-6">
                                         <label class="form-label fw-bold fs-8 text-dark mb-1">
                                             <i class="fa-solid fa-flag-checkered text-success me-1"></i> Order เริ่มเดิน (Start)
                                         </label>
@@ -734,7 +739,7 @@ const BhsApp = {
                                             <input type="text" name="order_start" id="order_start" class="form-control form-control-sm" placeholder="เช่น 10">
                                         </div>
                                     </div>
-                                    <div class="col-md-4">
+                                    <div class="col-md-3 col-6">
                                         <label class="form-label fw-bold fs-8 text-dark mb-1">
                                             <i class="fa-solid fa-flag text-danger me-1"></i> Order เดินจบ (Finit)
                                         </label>
@@ -743,9 +748,18 @@ const BhsApp = {
                                             <input type="text" name="order_finit" id="order_finit" class="form-control form-control-sm" placeholder="เช่น 1120">
                                         </div>
                                     </div>
-                                    <div class="col-md-4">
+                                    <div class="col-md-3 col-6">
                                         <label class="form-label fw-bold fs-8 text-dark mb-1">
-                                            <i class="fa-solid fa-triangle-exclamation text-warning me-1"></i> งานขาดจำนวน (Shortage Orders)
+                                            <i class="fa-solid fa-ruler-horizontal text-primary me-1"></i> เมตรเดินงานจริง
+                                        </label>
+                                        <div class="input-group input-group-sm">
+                                            <input type="number" step="any" min="0" name="actual_meters" id="actual_meters" class="form-control form-control-sm text-center fw-bold text-primary" placeholder="เว้นว่าง=ดึงจากไฟล์">
+                                            <span class="input-group-text bg-light text-secondary">เมตร</span>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3 col-6">
+                                        <label class="form-label fw-bold fs-8 text-dark mb-1">
+                                            <i class="fa-solid fa-triangle-exclamation text-warning me-1"></i> งานขาดจำนวน (Shortage)
                                         </label>
                                         <div class="input-group input-group-sm">
                                             <input type="number" name="shortage_orders" id="shortage_orders" class="form-control form-control-sm text-center" placeholder="0" min="0">
@@ -1095,6 +1109,7 @@ const BhsApp = {
                 order_start: parseInt(fd.get('order_start') || parsedResult.reliveData?.order_start || 10, 10) || 10,
                 order_finit: parseInt(fd.get('order_finit') || parsedResult.reliveData?.order_finit || 1120, 10) || 1120,
                 order_plan_total: 120,
+                actual_meters: Math.max(0, parseFloat(fd.get('actual_meters') || 0)),
                 inserted_meters: 0,
                 pending_meters: 0,
                 shortage_orders: Math.max(0, parseInt(fd.get('shortage_orders') || 0, 10)),

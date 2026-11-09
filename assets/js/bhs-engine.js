@@ -740,6 +740,7 @@ class BhsDB {
         const runningTimeMin = Math.max(0, actualShiftDuration - totalLossMinutes);
         const lossTotalPct = actualShiftDuration > 0 ? Math.round((totalLossMinutes / actualShiftDuration) * 10000) / 100 : 0;
 
+        const actualMeters = Number(report.actual_meters) > 0 ? Number(report.actual_meters) : summary.total_meters;
         const payload = {
             report_id: report.id,
             title: report.title,
@@ -751,7 +752,8 @@ class BhsDB {
             actual_shift_duration: actualShiftDuration,
             running_time_min: runningTimeMin,
             total_orders: summary.total_orders,
-            total_meters: summary.total_meters,
+            total_meters: actualMeters,
+            data_meters: summary.total_meters,
             total_weight_kg: summary.total_weight,
             total_weight_ton: Math.round((summary.total_weight / 1000) * 100) / 100,
             avg_speed: summary.avg_speed_gross,
