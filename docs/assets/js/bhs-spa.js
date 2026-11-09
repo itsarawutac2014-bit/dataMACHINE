@@ -889,6 +889,26 @@ const BhsApp = {
                     </div>
                 </div>
             </div>
+        </div>
+
+        <!-- Full-screen Processing Overlay Modal (ป้องกันการกดปุ่มซ้ำ) -->
+        <div id="processingUploadOverlay" class="d-none position-fixed top-0 start-0 w-100 h-100 align-items-center justify-content-center" style="background: rgba(15, 23, 42, 0.72); z-index: 9999; backdrop-filter: blur(3px);">
+            <div class="card border-0 shadow-lg rounded-4 text-center p-4 mx-3" style="max-width: 440px; width: 100%; border-top: 5px solid var(--theme-orange) !important;">
+                <div class="card-body py-3">
+                    <div class="mb-3">
+                        <div class="spinner-border text-warning" style="width: 3.5rem; height: 3.5rem; border-width: 0.35rem;" role="status"></div>
+                    </div>
+                    <h5 class="fw-bold text-dark mb-2" id="processingOverlayTitle">
+                        <i class="fa-solid fa-microchip text-orange me-2"></i>กำลังประมวลผลข้อมูล...
+                    </h5>
+                    <p class="text-secondary fs-7 mb-3" id="processingOverlayStep">
+                        ระบบกำลังอ่านไฟล์และคำนวณรายงานประสิทธิภาพ กรุณารอสักครู่...
+                    </p>
+                    <div class="alert alert-warning py-2 px-3 mb-0 fs-8 fw-semibold border-warning">
+                        <i class="fa-solid fa-hand me-1 text-danger"></i> กรุณารอสักครู่ ระบบได้ล็อกปุ่มเพื่อป้องกันการกดประมวลผลซ้ำ
+                    </div>
+                </div>
+            </div>
         </div>`;
     },
 
@@ -972,21 +992,47 @@ const BhsApp = {
     },
 
     async handleProcessUpload(useSample = false) {
+        if (this.isProcessingUpload) return;
+
         const form = document.getElementById('mainUploadForm');
+        const fileInput = document.getElementById('report_file');
+        const pastedHtml = document.getElementById('pasted_html')?.value?.trim() || '';
+
+        if (!useSample && (!fileInput || fileInput.files.length === 0) && !pastedHtml) {
+            alert('⚠️ กรุณาเลือกไฟล์ Excel (.xlsx) หรือไฟล์ตาราง HTML หรือวางโค้ดตารางเครื่องจักร ก่อนกดประมวลผล');
+            return;
+        }
+
+        this.isProcessingUpload = true;
         const btn = document.getElementById('btnSubmitUpload');
+        const btnSample = document.getElementById('btnUseSample');
+        const overlay = document.getElementById('processingUploadOverlay');
+        const overlayStep = document.getElementById('processingOverlayStep');
         const origHtml = btn ? btn.innerHTML : '';
+        const origSampleHtml = btnSample ? btnSample.innerHTML : '';
+
         if (btn) {
             btn.disabled = true;
-            btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin me-2"></i> กำลังประมวลผลข้อมูล...';
+            btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin me-2"></i> กำลังประมวลผลข้อมูล... (กรุณารอสักครู่)';
         }
+        if (btnSample) {
+            btnSample.disabled = true;
+            btnSample.innerHTML = '<i class="fa-solid fa-spinner fa-spin me-2"></i> กำลังประมวลผล...';
+        }
+        if (overlay) {
+            overlay.classList.remove('d-none');
+            overlay.classList.add('d-flex');
+        }
+
+        // ให้เบราว์เซอร์แสดงป๊อปอัปแจ้งเตือนขึ้นหน้าจอก่อนเริ่มคำนวณหนัก
+        await new Promise(resolve => setTimeout(resolve, 150));
 
         try {
             let parsedResult = null;
             let rawFilename = 'testing (23).html';
-            const fileInput = document.getElementById('report_file');
-            const pastedHtml = document.getElementById('pasted_html')?.value?.trim() || '';
 
             if (useSample) {
+                if (overlayStep) overlayStep.textContent = 'กำลังโหลดและวิเคราะห์ข้อมูลตัวอย่าง testing (23)...';
                 const resp = await fetch(`${this.basePath}/assets/data/sample_testing23.html`);
                 const rawHtml = await resp.text();
                 parsedResult = BhsEngine.parseHtmlTable(rawHtml);
@@ -994,6 +1040,8 @@ const BhsApp = {
             } else if (fileInput && fileInput.files.length > 0) {
                 const file = fileInput.files[0];
                 rawFilename = file.name;
+                if (overlayStep) overlayStep.textContent = `กำลังอ่านและประมวลผลไฟล์ "${rawFilename}" กรุณารอสักครู่...`;
+                await new Promise(resolve => setTimeout(resolve, 80));
                 const buf = await file.arrayBuffer();
                 const bytes = new Uint8Array(buf.slice(0, 4));
                 const isZip = (bytes[0] === 0x50 && bytes[1] === 0x4B);
@@ -1010,10 +1058,9 @@ const BhsApp = {
                     }
                 }
             } else if (pastedHtml) {
+                if (overlayStep) overlayStep.textContent = 'กำลังวิเคราะห์โค้ดตาราง HTML ที่วาง...';
                 rawFilename = `pasted_html_${new Date().toISOString().slice(0, 10)}.html`;
                 parsedResult = BhsEngine.parseHtmlTable(pastedHtml);
-            } else {
-                throw new Error('กรุณาเลือกไฟล์ Excel (.xlsx) หรือไฟล์ตาราง HTML หรือวางโค้ดตารางเครื่องจักร');
             }
 
             if (!parsedResult || !parsedResult.parsedRows || parsedResult.parsedRows.length === 0) {
@@ -1131,6 +1178,9 @@ const BhsApp = {
 
             BhsDB.state.bhs_shift_reports.push(newReport);
 
+            if (overlayStep) overlayStep.textContent = `กำลังบันทึกรายการผลิต ${parsedResult.parsedRows.length} รายการ และสร้างหน้ารายงาน...`;
+            await new Promise(resolve => setTimeout(resolve, 100));
+
             let maxRecId = (BhsDB.state.bhs_production_records || []).reduce((m, r) => Math.max(m, Number(r.id) || 0), 0);
             parsedResult.parsedRows.forEach(r => {
                 maxRecId++;
@@ -1144,14 +1194,24 @@ const BhsApp = {
             await BhsDB.save();
             BhsDB.syncReportToGoogleSheet(newReportId).catch(() => {});
 
+            this.isProcessingUpload = false;
             this.setFlash('success', `นำเข้าข้อมูลเครื่องจักรเรียบร้อยแล้ว จำนวน ${parsedResult.parsedRows.length} รายการ (กะ ${primaryShift})`);
             this.navigate(`#report_view?id=${newReportId}`);
         } catch (err) {
-            alert('เกิดข้อผิดพลาดในการประมวลผล: ' + err.message);
+            this.isProcessingUpload = false;
+            if (overlay) {
+                overlay.classList.remove('d-flex');
+                overlay.classList.add('d-none');
+            }
             if (btn) {
                 btn.disabled = false;
                 btn.innerHTML = origHtml;
             }
+            if (btnSample) {
+                btnSample.disabled = false;
+                btnSample.innerHTML = origSampleHtml;
+            }
+            alert('เกิดข้อผิดพลาดในการประมวลผล: ' + err.message);
         }
     }
 };

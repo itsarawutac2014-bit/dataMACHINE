@@ -504,7 +504,65 @@ document.addEventListener('DOMContentLoaded', function() {
     document.getElementById('shift_end_time')?.addEventListener('input', calculateDuration);
 
     calculateDuration();
+
+    // ป้องกันการกดปุ่มประมวลผลซ้ำและแสดงหน้าต่างแจ้งเตือนรอการประมวลผล
+    let isSubmitting = false;
+    function showProcessingOverlay() {
+        const ov = document.getElementById('processingUploadOverlay');
+        if (ov) {
+            ov.classList.remove('d-none');
+            ov.classList.add('d-flex');
+        }
+        const b1 = document.getElementById('btnSubmitUpload');
+        const b2 = document.getElementById('btnUseSample');
+        if (b1) {
+            b1.disabled = true;
+            b1.innerHTML = '<i class="fa-solid fa-spinner fa-spin me-2"></i> กำลังประมวลผลข้อมูล... (กรุณารอสักครู่)';
+        }
+        if (b2) {
+            b2.disabled = true;
+            b2.innerHTML = '<i class="fa-solid fa-spinner fa-spin me-2"></i> กำลังประมวลผล...';
+        }
+    }
+
+    document.getElementById('mainUploadForm')?.addEventListener('submit', function(e) {
+        if (isSubmitting) {
+            e.preventDefault();
+            return;
+        }
+        isSubmitting = true;
+        showProcessingOverlay();
+    });
+
+    document.getElementById('sampleForm')?.addEventListener('submit', function(e) {
+        if (isSubmitting) {
+            e.preventDefault();
+            return;
+        }
+        isSubmitting = true;
+        showProcessingOverlay();
+    });
 });
 </script>
+
+<!-- Full-screen Processing Overlay Modal (ป้องกันการกดปุ่มซ้ำ) -->
+<div id="processingUploadOverlay" class="d-none position-fixed top-0 start-0 w-100 h-100 align-items-center justify-content-center" style="background: rgba(15, 23, 42, 0.72); z-index: 9999; backdrop-filter: blur(3px);">
+    <div class="card border-0 shadow-lg rounded-4 text-center p-4 mx-3" style="max-width: 440px; width: 100%; border-top: 5px solid var(--theme-orange) !important;">
+        <div class="card-body py-3">
+            <div class="mb-3">
+                <div class="spinner-border text-warning" style="width: 3.5rem; height: 3.5rem; border-width: 0.35rem;" role="status"></div>
+            </div>
+            <h5 class="fw-bold text-dark mb-2">
+                <i class="fa-solid fa-microchip text-orange me-2"></i>กำลังประมวลผลข้อมูล...
+            </h5>
+            <p class="text-secondary fs-7 mb-3">
+                ระบบกำลังอ่านไฟล์และคำนวณรายงานประสิทธิภาพ กรุณารอสักครู่...
+            </p>
+            <div class="alert alert-warning py-2 px-3 mb-0 fs-8 fw-semibold border-warning">
+                <i class="fa-solid fa-hand me-1 text-danger"></i> กรุณารอสักครู่ ระบบได้ล็อกปุ่มเพื่อป้องกันการกดประมวลผลซ้ำ
+            </div>
+        </div>
+    </div>
+</div>
 
 <?php require_once __DIR__ . '/../includes/footer.php'; ?>
